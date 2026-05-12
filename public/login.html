@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>HospiData - Acceso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f4c81, #1fa2ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+        .logo { width: 100px; margin-bottom: 10px; }
+        h2 { color: #0f4c81; margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .captcha-box {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px dashed #bbb;
+        }
+        .captcha-img {
+            cursor: pointer;
+            margin-bottom: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0f4c81;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #1fa2ff; }
+        .footer { margin-top: 15px; font-size: 11px; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="/logo.png" alt="Logo" class="logo">
+    <h2>HospiData</h2>
+
+    <form action="/login" method="POST">
+        <input type="email" name="correo" placeholder="Correo electrónico" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+
+        <div class="captcha-box">
+            <img src="/captcha" class="captcha-img" id="imgCaptcha" title="Click para refrescar" onclick="this.src='/captcha?'+Date.now()">
+            <input type="text" name="captcha" placeholder="Escribe el código de arriba" required>
+        </div>
+
+        <button type="submit">Ingresar al Sistema</button>
+    </form>
+
+    <div class="footer">
+        &copy; 2026 HospiData - Gestión Hospitalaria Segura
+    </div>
+</div>
+
+</body>
+</html>

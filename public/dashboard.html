@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HospiData Dashboard</title>
+
+<link rel="stylesheet" href="dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo-section">
+        <img src="logo.png" class="logo">
+        <h2>HospiData</h2>
+    </div>
+
+    <ul class="menu">
+        <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+        <li><a href="#"><i class="fa-solid fa-users"></i> Usuarios</a></li>
+        <li><a href="#"><i class="fa-solid fa-bed"></i> Pacientes</a></li>
+        <li><a href="#"><i class="fa-solid fa-calendar"></i> Citas</a></li>
+        <li><a href="#"><i class="fa-solid fa-pills"></i> Farmacia</a></li>
+    </ul>
+
+    <a href="/logout" class="logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Cerrar sesión
+    </a>
+
+</div>
+
+<div class="main-content">
+
+    <div class="topbar">
+
+        <h1>Panel de Control</h1>
+
+        <div class="user-box">
+            <img src="https://i.pravatar.cc/40">
+
+            <div>
+                <strong id="nombreUsuario">Usuario</strong>
+                <p id="rolUsuario">Administrador</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <i class="fa-solid fa-users"></i>
+            <h2>156</h2>
+            <p>Usuarios</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-bed"></i>
+            <h2>842</h2>
+            <p>Pacientes</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-calendar-check"></i>
+            <h2>32</h2>
+            <p>Citas Hoy</p>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-capsules"></i>
+            <h2>128</h2>
+            <p>Medicamentos</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>
