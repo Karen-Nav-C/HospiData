@@ -1,87 +1,313 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>HospiData - Acceso</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f4c81, #1fa2ff);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 350px;
-            text-align: center;
-        }
-        .logo { width: 100px; margin-bottom: 10px; }
-        h2 { color: #0f4c81; margin-bottom: 20px; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-        .captcha-box {
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border: 1px dashed #bbb;
-        }
-        .captcha-img {
-            cursor: pointer;
-            margin-bottom: 5px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #0f4c81;
-            border: none;
-            color: white;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover { background: #1fa2ff; }
-        .footer { margin-top: 15px; font-size: 11px; color: #888; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HospiData — Iniciar Sesión</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f4c81 0%, #1a6fc4 50%, #0e3d6e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+ 
+  .container {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    min-height: 540px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+  }
+ 
+  /* PANEL IZQUIERDO */
+  .panel-left {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    width: 45%;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+ 
+  .logo {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .logo span { color: #90cdf4; }
+ 
+  .tagline {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-bottom: 40px;
+    line-height: 1.5;
+  }
+ 
+  .features { list-style: none; }
+  .features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+    opacity: 0.85;
+  }
+  .features li .dot {
+    width: 8px; height: 8px;
+    background: #90cdf4;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+ 
+  .visitantes-link {
+    margin-top: auto;
+    padding-top: 30px;
+    font-size: 0.82rem;
+    opacity: 0.7;
+  }
+  .visitantes-link a {
+    color: #90cdf4;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .visitantes-link a:hover { text-decoration: underline; }
+ 
+  /* PANEL DERECHO */
+  .panel-right {
+    background: white;
+    flex: 1;
+    padding: 50px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+ 
+  .panel-right h2 {
+    font-size: 1.6rem;
+    color: #0f4c81;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .panel-right p.sub {
+    color: #6b7280;
+    font-size: 0.88rem;
+    margin-bottom: 30px;
+  }
+ 
+  .form-group {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: #1e293b;
+  }
+  input:focus {
+    border-color: #1a6fc4;
+    box-shadow: 0 0 0 3px rgba(26,111,196,0.12);
+  }
+ 
+  /* CAPTCHA */
+  .captcha-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .captcha-img {
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 48px;
+    flex-shrink: 0;
+  }
+  .captcha-input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .captcha-input:focus { border-color: #1a6fc4; }
+  .captcha-hint {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+ 
+  /* ALERTA ERROR */
+  .alerta {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .alerta.visible { display: block; }
+ 
+  /* BOTÓN */
+  .btn-login {
+    width: 100%;
+    padding: 13px;
+    background: #0f4c81;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.3px;
+  }
+  .btn-login:hover { background: #1a6fc4; }
+  .btn-login:active { transform: scale(0.98); }
+ 
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.78rem;
+    color: #9ca3af;
+  }
+ 
+  @media (max-width: 640px) {
+    .panel-left { display: none; }
+    .container { max-width: 420px; }
+    .panel-right { padding: 40px 28px; }
+  }
+</style>
 </head>
 <body>
-
+ 
 <div class="container">
-    <img src="/logo.png" alt="Logo" class="logo">
-    <h2>HospiData</h2>
-
-    <form action="/login" method="POST">
-        <input type="email" name="correo" placeholder="Correo electrónico" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-
-        <div class="captcha-box">
-            <img src="/captcha" class="captcha-img" id="imgCaptcha" title="Click para refrescar" onclick="this.src='/captcha?'+Date.now()">
-            <input type="text" name="captcha" placeholder="Escribe el código de arriba" required>
-        </div>
-
-        <button type="submit">Ingresar al Sistema</button>
-    </form>
-
-    <div class="footer">
-        &copy; 2026 HospiData - Gestión Hospitalaria Segura
+ 
+  <!-- IZQUIERDA -->
+  <div class="panel-left">
+    <div class="logo">Hospi<span>Data</span></div>
+    <p class="tagline">Sistema Integral de Administración Hospitalaria</p>
+ 
+    <ul class="features">
+      <li><span class="dot"></span> Gestión de pacientes y expedientes</li>
+      <li><span class="dot"></span> Control de citas y visitas</li>
+      <li><span class="dot"></span> Farmacia e inventario en tiempo real</li>
+      <li><span class="dot"></span> Historial médico electrónico</li>
+      <li><span class="dot"></span> Acceso por roles y permisos</li>
+      <li><span class="dot"></span> Registro de actividad del sistema</li>
+    </ul>
+ 
+    <div class="visitantes-link">
+      ¿Eres visitante? <a href="/visitantes">Agenda tu visita aquí →</a>
     </div>
+  </div>
+ 
+  <!-- DERECHA -->
+  <div class="panel-right">
+    <h2>Bienvenido</h2>
+    <p class="sub">Ingresa tus credenciales para acceder al sistema</p>
+ 
+    <div class="alerta" id="alerta-error"></div>
+ 
+    <form method="POST" action="/login" onsubmit="validarForm(event)">
+ 
+      <div class="form-group">
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo"
+               placeholder="usuario@hospidata.com" required autocomplete="email">
+      </div>
+ 
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="current-password">
+      </div>
+ 
+      <div class="form-group">
+        <label>Verificación de seguridad</label>
+        <div class="captcha-row">
+          <img class="captcha-img" id="captcha-img"
+               src="/captcha" alt="CAPTCHA"
+               title="Haz clic para recargar"
+               onclick="recargarCaptcha()">
+          <input class="captcha-input" type="text" name="captcha"
+                 placeholder="Escribe los caracteres" required
+                 autocomplete="off" spellcheck="false">
+        </div>
+        <p class="captcha-hint">Haz clic en la imagen para generar uno nuevo</p>
+      </div>
+ 
+      <button class="btn-login" type="submit">Iniciar Sesión</button>
+ 
+    </form>
+ 
+    <p class="footer-note">HospiData v1.0 &mdash; Acceso solo para personal autorizado</p>
+  </div>
+ 
 </div>
-
+ 
+<script>
+  // Mostrar error si viene en la URL
+  const params = new URLSearchParams(window.location.search);
+  const errores = {
+    captcha:  "El código de verificación es incorrecto. Intenta de nuevo.",
+    usuario:  "No se encontró una cuenta activa con ese correo.",
+    password: "Contraseña incorrecta. Verifica tus datos."
+  };
+  const err = params.get("error");
+  if (err && errores[err]) {
+    const alerta = document.getElementById("alerta-error");
+    alerta.textContent = errores[err];
+    alerta.classList.add("visible");
+    recargarCaptcha();
+  }
+ 
+  function recargarCaptcha() {
+    const img = document.getElementById("captcha-img");
+    img.src = "/captcha?" + Date.now();
+  }
+ 
+  function validarForm(e) {
+    const correo   = document.getElementById("correo").value.trim();
+    const password = document.getElementById("password").value;
+    if (!correo || !password) {
+      e.preventDefault();
+      const alerta = document.getElementById("alerta-error");
+      alerta.textContent = "Por favor completa todos los campos.";
+      alerta.classList.add("visible");
+    }
+  }
+</script>
+ 
 </body>
 </html>

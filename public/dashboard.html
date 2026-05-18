@@ -2,89 +2,1159 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>HospiData Dashboard</title>
-
-<link rel="stylesheet" href="dashboard.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HospiData — Dashboard</title>
+<style>
+  :root {
+    --azul:       #0f4c81;
+    --azul-m:     #1a6fc4;
+    --azul-c:     #e8f1fb;
+    --sidebar-w:  240px;
+    --top-h:      60px;
+    --radio:      10px;
+    --sombra:     0 2px 16px rgba(15,76,129,0.09);
+    --gris:       #6b7280;
+    --fondo:      #f0f4f9;
+    --blanco:     #ffffff;
+    --verde:      #16a34a;
+    --rojo:       #dc2626;
+    --amarillo:   #d97706;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); color: #1e293b; }
+ 
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: var(--top-h);
+    background: var(--azul); color: white;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .topbar .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+  .topbar .logo span { color: #90cdf4; }
+  .topbar .user-info { display: flex; align-items: center; gap: 14px; font-size: 0.88rem; }
+  .topbar .user-info .nombre { opacity: 0.9; }
+  .topbar .user-info .rol-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 3px 10px; border-radius: 20px; font-size: 0.75rem;
+  }
+  .btn-logout {
+    background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.25);
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.82rem;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.22); }
+ 
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; top: var(--top-h); left: 0; bottom: 0;
+    width: var(--sidebar-w); background: var(--blanco);
+    border-right: 1px solid #e2e8f0; padding: 20px 0;
+    overflow-y: auto; z-index: 90;
+  }
+  .sidebar-section { padding: 0 12px; margin-bottom: 6px; }
+  .sidebar-label {
+    font-size: 0.7rem; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 8px 10px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    cursor: pointer; font-size: 0.88rem; color: #374151;
+    transition: all 0.15s; user-select: none;
+  }
+  .nav-item:hover { background: var(--azul-c); color: var(--azul); }
+  .nav-item.active { background: var(--azul); color: white; font-weight: 600; }
+  .nav-item .icon { font-size: 1.1rem; width: 22px; text-align: center; }
+  .nav-item .badge {
+    margin-left: auto; background: #dc2626; color: white;
+    font-size: 0.68rem; padding: 1px 6px; border-radius: 10px; font-weight: 700;
+  }
+  .nav-item.active .badge { background: rgba(255,255,255,0.3); }
+ 
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w); padding-top: var(--top-h);
+    min-height: 100vh;
+  }
+  .section { display: none; padding: 28px; }
+  .section.active { display: block; }
+ 
+  .section-title {
+    font-size: 1.4rem; font-weight: 700; color: var(--azul);
+    margin-bottom: 4px;
+  }
+  .section-sub { font-size: 0.85rem; color: var(--gris); margin-bottom: 24px; }
+ 
+  /* ── CARDS ── */
+  .card {
+    background: var(--blanco); border-radius: 14px;
+    padding: 24px; box-shadow: var(--sombra); margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .card-header h3 { font-size: 1rem; color: var(--azul); font-weight: 600; }
+ 
+  /* ── STAT CARDS ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat {
+    background: var(--blanco); border-radius: 12px; padding: 20px;
+    box-shadow: var(--sombra); display: flex; align-items: center; gap: 14px;
+  }
+  .stat .icon-bg {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .stat .val { font-size: 1.8rem; font-weight: 800; color: var(--azul); line-height: 1; }
+  .stat .lbl { font-size: 0.78rem; color: var(--gris); margin-top: 2px; }
+  .bg-azul   { background: #dbeafe; }
+  .bg-verde  { background: #dcfce7; }
+  .bg-amber  { background: #fef3c7; }
+  .bg-rosa   { background: #fce7f3; }
+ 
+  /* ── TABLA ── */
+  .tabla-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+  thead th {
+    background: var(--fondo); color: var(--gris); font-weight: 600;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 10px 14px; text-align: left; white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { padding: 11px 14px; color: #374151; }
+  .empty-row td { text-align: center; color: #9ca3af; padding: 30px; }
+ 
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.73rem; font-weight: 700;
+  }
+  .badge.pendiente  { background: #fef3c7; color: #92400e; }
+  .badge.aprobada   { background: #d1fae5; color: #065f46; }
+  .badge.rechazada  { background: #fee2e2; color: #991b1b; }
+  .badge.completada { background: #e0e7ff; color: #3730a3; }
+  .badge.entregado  { background: #d1fae5; color: #065f46; }
+  .badge.activo     { background: #d1fae5; color: #065f46; }
+  .badge.inactivo   { background: #fee2e2; color: #991b1b; }
+  .badge.controlado { background: #fee2e2; color: #991b1b; }
+  .badge.psiquiatrico { background: #ede9fe; color: #5b21b6; }
+ 
+  /* ── BOTONES ── */
+  .btn {
+    padding: 8px 16px; border-radius: 7px; border: none;
+    cursor: pointer; font-size: 0.82rem; font-weight: 600;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn-primary { background: var(--azul); color: white; }
+  .btn-primary:hover { background: var(--azul-m); }
+  .btn-success { background: #16a34a; color: white; }
+  .btn-success:hover { background: #15803d; }
+  .btn-danger  { background: #dc2626; color: white; }
+  .btn-danger:hover  { background: #b91c1c; }
+  .btn-warning { background: #d97706; color: white; }
+  .btn-warning:hover { background: #b45309; }
+  .btn-ghost   { background: #f1f5f9; color: #374151; }
+  .btn-ghost:hover   { background: #e2e8f0; }
+  .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+ 
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 200;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 16px; padding: 32px;
+    width: 100%; max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 1.15rem; color: var(--azul); margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: #374151; margin-bottom: 5px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid #d1d5db; border-radius: 7px;
+    font-size: 0.9rem; font-family: inherit; outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--azul-m); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+ 
+  /* ── ALERTAS ── */
+  .alerta-box {
+    padding: 12px 16px; border-radius: 8px; margin-bottom: 10px;
+    font-size: 0.85rem; display: flex; align-items: flex-start; gap: 8px;
+  }
+  .alerta-box.danger { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+  .alerta-box.warning { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+ 
+  /* ── LOADING ── */
+  .loading { text-align: center; padding: 40px; color: var(--gris); font-size: 0.9rem; }
+  .spinner {
+    width: 32px; height: 32px; border: 3px solid #e2e8f0;
+    border-top-color: var(--azul); border-radius: 50%;
+    animation: spin 0.7s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  /* ── ACCESO DENEGADO ── */
+  .no-access {
+    text-align: center; padding: 60px 20px; color: var(--gris);
+  }
+  .no-access .icon { font-size: 3rem; margin-bottom: 12px; }
+ 
+  /* ── ALERTAS MEDICAMENTOS ── */
+  .alertas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .alertas-grid { grid-template-columns: 1fr; } }
+</style>
 </head>
-
 <body>
-
+ 
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">Hospi<span>Data</span></div>
+  <div class="user-info">
+    <span class="nombre" id="top-nombre">Cargando...</span>
+    <span class="rol-badge" id="top-rol"></span>
+    <a href="/logout" class="btn-logout">Cerrar sesión</a>
+  </div>
+</div>
+ 
+<!-- SIDEBAR -->
 <div class="sidebar">
-
-    <div class="logo-section">
-        <img src="logo.png" class="logo">
-        <h2>HospiData</h2>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Principal</div>
+    <div class="nav-item active" onclick="ir('inicio')">
+      <span class="icon">🏠</span> Inicio
     </div>
-
-    <ul class="menu">
-        <li><a href="#"><i class="fa-solid fa-house"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fa-solid fa-users"></i> Usuarios</a></li>
-        <li><a href="#"><i class="fa-solid fa-bed"></i> Pacientes</a></li>
-        <li><a href="#"><i class="fa-solid fa-calendar"></i> Citas</a></li>
-        <li><a href="#"><i class="fa-solid fa-pills"></i> Farmacia</a></li>
-    </ul>
-
-    <a href="/logout" class="logout">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Cerrar sesión
-    </a>
-
+  </div>
+ 
+  <div class="sidebar-section" id="nav-admin" style="display:none">
+    <div class="sidebar-label">Administración</div>
+    <div class="nav-item" onclick="ir('usuarios')">
+      <span class="icon">👥</span> Usuarios
+    </div>
+    <div class="nav-item" onclick="ir('personal')">
+      <span class="icon">🏥</span> Personal
+    </div>
+    <div class="nav-item" onclick="ir('registros')">
+      <span class="icon">📋</span> Logs
+    </div>
+  </div>
+ 
+  <div class="sidebar-section" id="nav-medico" style="display:none">
+    <div class="sidebar-label">Módulo Médico</div>
+    <div class="nav-item" onclick="ir('pacientes')">
+      <span class="icon">🧑‍⚕️</span> Pacientes
+    </div>
+    <div class="nav-item" onclick="ir('citas')">
+      <span class="icon">📅</span> Citas
+      <span class="badge" id="badge-citas" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="ir('recetas')">
+      <span class="icon">💊</span> Recetas
+    </div>
+  </div>
+ 
+  <div class="sidebar-section" id="nav-farmacia" style="display:none">
+    <div class="sidebar-label">Farmacia</div>
+    <div class="nav-item" onclick="ir('medicamentos')">
+      <span class="icon">💉</span> Medicamentos
+    </div>
+    <div class="nav-item" onclick="ir('recetas')">
+      <span class="icon">📄</span> Recetas
+    </div>
+    <div class="nav-item" onclick="ir('alertas')">
+      <span class="icon">🔔</span> Alertas
+    </div>
+  </div>
+ 
+  <div class="sidebar-section" id="nav-inventario" style="display:none">
+    <div class="sidebar-label">Inventario</div>
+    <div class="nav-item" onclick="ir('inventario')">
+      <span class="icon">📦</span> Equipo
+    </div>
+    <div class="nav-item" onclick="ir('medicamentos')">
+      <span class="icon">💊</span> Medicamentos
+    </div>
+    <div class="nav-item" onclick="ir('alertas')">
+      <span class="icon">⚠️</span> Alertas
+    </div>
+  </div>
 </div>
-
-<div class="main-content">
-
-    <div class="topbar">
-
-        <h1>Panel de Control</h1>
-
-        <div class="user-box">
-            <img src="https://i.pravatar.cc/40">
-
-            <div>
-                <strong id="nombreUsuario">Usuario</strong>
-                <p id="rolUsuario">Administrador</p>
-            </div>
-        </div>
-
+ 
+<!-- MAIN -->
+<div class="main">
+ 
+  <!-- ===== INICIO ===== -->
+  <div class="section active" id="sec-inicio">
+    <div class="section-title" id="bienvenida-titulo">Bienvenido</div>
+    <div class="section-sub" id="bienvenida-sub">Panel de administración HospiData</div>
+ 
+    <div class="stats">
+      <div class="stat">
+        <div class="icon-bg bg-azul">🧑‍⚕️</div>
+        <div><div class="val" id="stat-pacientes">—</div><div class="lbl">Pacientes</div></div>
+      </div>
+      <div class="stat">
+        <div class="icon-bg bg-verde">📅</div>
+        <div><div class="val" id="stat-citas">—</div><div class="lbl">Citas hoy</div></div>
+      </div>
+      <div class="stat">
+        <div class="icon-bg bg-amber">💊</div>
+        <div><div class="val" id="stat-meds">—</div><div class="lbl">Medicamentos</div></div>
+      </div>
+      <div class="stat">
+        <div class="icon-bg bg-rosa">⚠️</div>
+        <div><div class="val" id="stat-alertas">—</div><div class="lbl">Alertas</div></div>
+      </div>
     </div>
-
-    <div class="cards">
-
-        <div class="card">
-            <i class="fa-solid fa-users"></i>
-            <h2>156</h2>
-            <p>Usuarios</p>
-        </div>
-
-        <div class="card">
-            <i class="fa-solid fa-bed"></i>
-            <h2>842</h2>
-            <p>Pacientes</p>
-        </div>
-
-        <div class="card">
-            <i class="fa-solid fa-calendar-check"></i>
-            <h2>32</h2>
-            <p>Citas Hoy</p>
-        </div>
-
-        <div class="card">
-            <i class="fa-solid fa-capsules"></i>
-            <h2>128</h2>
-            <p>Medicamentos</p>
-        </div>
-
+ 
+    <div class="card">
+      <div class="card-header"><h3>📅 Últimas citas registradas</h3></div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Folio</th><th>Visitante</th><th>Paciente</th><th>Fecha</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="tabla-citas-inicio"></tbody>
+        </table>
+      </div>
     </div>
-
+  </div>
+ 
+  <!-- ===== USUARIOS ===== -->
+  <div class="section" id="sec-usuarios">
+    <div class="section-title">Usuarios del sistema</div>
+    <div class="section-sub">Gestiona cuentas, roles y accesos</div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Lista de usuarios</h3>
+        <button class="btn btn-primary" onclick="abrirModal('modal-usuario')">+ Nuevo usuario</button>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="tabla-usuarios"><tr class="empty-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== PERSONAL ===== -->
+  <div class="section" id="sec-personal">
+    <div class="section-title">Personal médico</div>
+    <div class="section-sub">Especialidades, turnos y permisos especiales</div>
+    <div class="card">
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Rol</th><th>Especialidad</th><th>Turno</th><th>Controlados</th><th>Psiquiátricos</th></tr>
+          </thead>
+          <tbody id="tabla-personal"><tr class="empty-row"><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== PACIENTES ===== -->
+  <div class="section" id="sec-pacientes">
+    <div class="section-title">Gestión de pacientes</div>
+    <div class="section-sub">Registro, diagnóstico y asignación de habitación</div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Pacientes registrados</h3>
+        <button class="btn btn-primary" onclick="abrirModal('modal-paciente')">+ Nuevo paciente</button>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Edad</th><th>Habitación</th><th>Diagnóstico</th><th>Médico</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="tabla-pacientes"><tr class="empty-row"><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== CITAS ===== -->
+  <div class="section" id="sec-citas">
+    <div class="section-title">Citas y visitas</div>
+    <div class="section-sub">Aprueba, rechaza o completa visitas registradas</div>
+    <div class="card">
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Folio</th><th>Visitante</th><th>Paciente</th><th>Fecha</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="tabla-citas"><tr class="empty-row"><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== MEDICAMENTOS ===== -->
+  <div class="section" id="sec-medicamentos">
+    <div class="section-title">Inventario de medicamentos</div>
+    <div class="section-sub">Stock, caducidad y restricciones de receta</div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Medicamentos registrados</h3>
+        <button class="btn btn-primary" onclick="abrirModal('modal-medicamento')">+ Nuevo medicamento</button>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Cantidad</th><th>Unidad</th><th>Caducidad</th><th>Tipo</th><th>Precio</th></tr>
+          </thead>
+          <tbody id="tabla-medicamentos"><tr class="empty-row"><td colspan="6"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== INVENTARIO ===== -->
+  <div class="section" id="sec-inventario">
+    <div class="section-title">Equipo e inventario</div>
+    <div class="section-sub">Equipos médicos y material hospitalario</div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Inventario general</h3>
+        <button class="btn btn-primary" onclick="abrirModal('modal-inventario')">+ Registrar equipo</button>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Tipo</th><th>Cantidad</th><th>Estado</th><th>Descripción</th></tr>
+          </thead>
+          <tbody id="tabla-inventario"><tr class="empty-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== RECETAS ===== -->
+  <div class="section" id="sec-recetas">
+    <div class="section-title">Recetas médicas</div>
+    <div class="section-sub">Control de prescripciones y entregas de farmacia</div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Recetas emitidas</h3>
+        <button class="btn btn-primary" id="btn-nueva-receta" onclick="abrirModal('modal-receta')" style="display:none">+ Nueva receta</button>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Paciente</th><th>Médico</th><th>Medicamento</th><th>Dosis</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="tabla-recetas"><tr class="empty-row"><td colspan="7"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== ALERTAS ===== -->
+  <div class="section" id="sec-alertas">
+    <div class="section-title">Alertas del sistema</div>
+    <div class="section-sub">Medicamentos con stock bajo o próximos a caducar</div>
+    <div class="alertas-grid">
+      <div class="card">
+        <div class="card-header"><h3>⚠️ Stock bajo</h3></div>
+        <div id="alertas-stock"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📅 Próximos a caducar</h3></div>
+        <div id="alertas-caducidad"></div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ===== LOGS ===== -->
+  <div class="section" id="sec-registros">
+    <div class="section-title">Registro de actividad</div>
+    <div class="section-sub">Últimas 200 acciones del sistema</div>
+    <div class="card">
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th><th>IP</th></tr>
+          </thead>
+          <tbody id="tabla-registros"><tr class="empty-row"><td colspan="5"><div class="spinner"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ 
+</div><!-- /main -->
+ 
+<!-- ===== MODALES ===== -->
+ 
+<!-- Modal: Nuevo Usuario -->
+<div class="modal-overlay" id="modal-usuario">
+  <div class="modal">
+    <h3>➕ Nuevo usuario</h3>
+    <div class="form-group"><label>Nombre completo</label>
+      <input type="text" id="u-nombre" placeholder="Ej. Dr. Juan García"></div>
+    <div class="form-group"><label>Correo electrónico</label>
+      <input type="email" id="u-correo" placeholder="correo@hospidata.com"></div>
+    <div class="form-group"><label>Contraseña</label>
+      <input type="password" id="u-password" placeholder="Mínimo 8 caracteres"></div>
+    <div class="form-group"><label>Rol</label>
+      <select id="u-rol">
+        <option value="personal_medico">Médico general</option>
+        <option value="medico_psiquiatra">Médico psiquiatra</option>
+        <option value="personal_enfermeria">Enfermería</option>
+        <option value="personal_farmacia">Farmacia</option>
+        <option value="personal_administrativo">Administrativo</option>
+        <option value="personal_limpieza">Limpieza</option>
+        <option value="recursos_humanos">Recursos Humanos</option>
+        <option value="admin_secundario">Admin secundario</option>
+        <option value="paciente">Paciente</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearUsuario()">Crear usuario</button>
+    </div>
+  </div>
 </div>
-
-<script src="dashboard.js"></script>
-
+ 
+<!-- Modal: Nuevo Paciente -->
+<div class="modal-overlay" id="modal-paciente">
+  <div class="modal">
+    <h3>🧑‍⚕️ Nuevo paciente</h3>
+    <div class="form-group"><label>Nombre completo</label>
+      <input type="text" id="p-nombre" placeholder="Nombre del paciente"></div>
+    <div class="form-group"><label>Edad</label>
+      <input type="number" id="p-edad" placeholder="Años" min="0" max="120"></div>
+    <div class="form-group"><label>Teléfono</label>
+      <input type="text" id="p-telefono" placeholder="333-0000-000"></div>
+    <div class="form-group"><label>Habitación</label>
+      <input type="text" id="p-habitacion" placeholder="Ej. Habitación 302-A"></div>
+    <div class="form-group"><label>Diagnóstico</label>
+      <input type="text" id="p-diagnostico" placeholder="Diagnóstico principal"></div>
+    <div class="form-group"><label>Dirección</label>
+      <input type="text" id="p-direccion" placeholder="Dirección del paciente"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-paciente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearPaciente()">Registrar</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- Modal: Nuevo Medicamento -->
+<div class="modal-overlay" id="modal-medicamento">
+  <div class="modal">
+    <h3>💊 Nuevo medicamento</h3>
+    <div class="form-group"><label>Nombre</label>
+      <input type="text" id="m-nombre" placeholder="Ej. Paracetamol 500mg"></div>
+    <div class="form-group"><label>Descripción</label>
+      <input type="text" id="m-desc" placeholder="Uso y presentación"></div>
+    <div class="form-group"><label>Cantidad en stock</label>
+      <input type="number" id="m-cantidad" placeholder="0" min="0"></div>
+    <div class="form-group"><label>Unidad</label>
+      <input type="text" id="m-unidad" placeholder="tabletas / cápsulas / ml"></div>
+    <div class="form-group"><label>Precio unitario</label>
+      <input type="number" id="m-precio" placeholder="0.00" step="0.01" min="0"></div>
+    <div class="form-group"><label>Fecha de caducidad</label>
+      <input type="date" id="m-caducidad"></div>
+    <div class="form-group"><label>Alerta mínimo (unidades)</label>
+      <input type="number" id="m-alerta" placeholder="10" min="1"></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="m-tipo">
+        <option value="00">General</option>
+        <option value="10">Controlado</option>
+        <option value="01">Psiquiátrico</option>
+        <option value="11">Controlado + Psiquiátrico</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-medicamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearMedicamento()">Registrar</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- Modal: Nuevo Inventario -->
+<div class="modal-overlay" id="modal-inventario">
+  <div class="modal">
+    <h3>📦 Registrar equipo</h3>
+    <div class="form-group"><label>Nombre del equipo</label>
+      <input type="text" id="i-nombre" placeholder="Ej. Silla de ruedas"></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="i-tipo">
+        <option value="equipo">Equipo médico</option>
+        <option value="insumo">Insumo / Material</option>
+        <option value="mobiliario">Mobiliario</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Cantidad</label>
+      <input type="number" id="i-cantidad" placeholder="0" min="0"></div>
+    <div class="form-group"><label>Estado</label>
+      <select id="i-estado">
+        <option value="disponible">Disponible</option>
+        <option value="en_uso">En uso</option>
+        <option value="mantenimiento">En mantenimiento</option>
+        <option value="dado_de_baja">Dado de baja</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Descripción</label>
+      <input type="text" id="i-desc" placeholder="Descripción del equipo"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-inventario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearInventario()">Registrar</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- Modal: Nueva Receta -->
+<div class="modal-overlay" id="modal-receta">
+  <div class="modal">
+    <h3>💊 Nueva receta</h3>
+    <div class="form-group"><label>Paciente</label>
+      <select id="r-paciente"></select></div>
+    <div class="form-group"><label>Medicamento</label>
+      <select id="r-medicamento"></select></div>
+    <div class="form-group"><label>Dosis</label>
+      <input type="text" id="r-dosis" placeholder="Ej. 1 tableta cada 8 horas"></div>
+    <div class="form-group"><label>Indicaciones</label>
+      <textarea id="r-indicaciones" rows="3" placeholder="Indicaciones adicionales..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarModal('modal-receta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearReceta()">Emitir receta</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// =============================================
+// ESTADO GLOBAL
+// =============================================
+let USER = null;
+const ROLES_ADMIN    = ["admin_principal","admin_secundario"];
+const ROLES_MEDICO   = ["personal_medico","medico_psiquiatra","admin_principal","admin_secundario"];
+const ROLES_FARMACIA = ["personal_farmacia","admin_principal","admin_secundario"];
+const ROLES_INV      = ["personal_administrativo","personal_farmacia","admin_principal","admin_secundario"];
+ 
+// =============================================
+// INIT
+// =============================================
+async function init() {
+  const res = await fetch("/api/me");
+  if (!res.ok) { window.location = "/"; return; }
+  USER = await res.json();
+ 
+  document.getElementById("top-nombre").textContent = USER.nombre;
+  document.getElementById("top-rol").textContent = USER.rol.replace(/_/g," ").toUpperCase();
+  document.getElementById("bienvenida-titulo").textContent = `Bienvenido, ${USER.nombre}`;
+  document.getElementById("bienvenida-sub").textContent = `Rol: ${USER.rol.replace(/_/g," ")} — ${new Date().toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}`;
+ 
+  // Mostrar menús según rol
+  if (ROLES_ADMIN.includes(USER.rol)) {
+    document.getElementById("nav-admin").style.display = "";
+    document.getElementById("nav-medico").style.display = "";
+    document.getElementById("nav-farmacia").style.display = "";
+    document.getElementById("nav-inventario").style.display = "";
+  }
+  if (ROLES_MEDICO.includes(USER.rol)) {
+    document.getElementById("nav-medico").style.display = "";
+  }
+  if (ROLES_FARMACIA.includes(USER.rol)) {
+    document.getElementById("nav-farmacia").style.display = "";
+  }
+  if (ROLES_INV.includes(USER.rol)) {
+    document.getElementById("nav-inventario").style.display = "";
+  }
+ 
+  // Mostrar botón nueva receta solo para médicos
+  if (ROLES_MEDICO.filter(r=>r!=="admin_principal"&&r!=="admin_secundario").includes(USER.rol)) {
+    document.getElementById("btn-nueva-receta").style.display = "";
+  }
+ 
+  cargarInicio();
+}
+ 
+// =============================================
+// NAVEGACIÓN
+// =============================================
+function ir(seccion) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+ 
+  document.getElementById("sec-" + seccion).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => {
+    if (n.getAttribute("onclick") === `ir('${seccion}')`) n.classList.add("active");
+  });
+ 
+  const loaders = {
+    usuarios:     cargarUsuarios,
+    personal:     cargarPersonal,
+    pacientes:    cargarPacientes,
+    citas:        cargarCitas,
+    medicamentos: cargarMedicamentos,
+    inventario:   cargarInventario,
+    recetas:      cargarRecetas,
+    alertas:      cargarAlertas,
+    registros:    cargarRegistros,
+  };
+  if (loaders[seccion]) loaders[seccion]();
+}
+ 
+// =============================================
+// UTILIDADES
+// =============================================
+const api = async (url, opts = {}) => {
+  const r = await fetch(url, { headers: {"Content-Type":"application/json"}, ...opts });
+  return r.json();
+};
+ 
+const fmtFecha = iso => iso
+  ? new Date(iso).toLocaleString("es-MX",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})
+  : "—";
+ 
+const badge = (estado) => `<span class="badge ${estado}">${estado}</span>`;
+ 
+function abrirModal(id) { document.getElementById(id).classList.add("open"); }
+function cerrarModal(id) { document.getElementById(id).classList.remove("open"); }
+ 
+// Cerrar modal al hacer clic fuera
+document.querySelectorAll(".modal-overlay").forEach(m => {
+  m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); });
+});
+ 
+const confirmar = (msg) => confirm(`⚠️ ${msg}\n\nEsta acción no se puede deshacer.`);
+ 
+// =============================================
+// INICIO
+// =============================================
+async function cargarInicio() {
+  const [citas, meds] = await Promise.all([
+    api("/api/citas").catch(()=>[]),
+    api("/api/medicamentos").catch(()=>[])
+  ]);
+ 
+  // Stats
+  const pacR = await api("/api/pacientes").catch(()=>[]);
+  document.getElementById("stat-pacientes").textContent = Array.isArray(pacR) ? pacR.length : "—";
+  document.getElementById("stat-meds").textContent = Array.isArray(meds) ? meds.length : "—";
+ 
+  if (Array.isArray(citas)) {
+    const hoy = new Date().toDateString();
+    const citasHoy = citas.filter(c => c.fecha && new Date(c.fecha).toDateString() === hoy);
+    document.getElementById("stat-citas").textContent = citasHoy.length;
+ 
+    const pendientes = citas.filter(c => c.estado === "pendiente").length;
+    if (pendientes > 0) {
+      const b = document.getElementById("badge-citas");
+      b.textContent = pendientes; b.style.display = "";
+    }
+ 
+    // Tabla inicio
+    const tbody = document.getElementById("tabla-citas-inicio");
+    const recientes = citas.slice(0, 8);
+    tbody.innerHTML = recientes.length === 0
+      ? `<tr class="empty-row"><td colspan="5">No hay citas registradas</td></tr>`
+      : recientes.map(c => `<tr>
+          <td><strong>${c.folio||"—"}</strong></td>
+          <td>${c.visitante_nombre||"—"}</td>
+          <td>${c.paciente_nombre||"—"}</td>
+          <td>${fmtFecha(c.fecha)}</td>
+          <td>${badge(c.estado)}</td>
+        </tr>`).join("");
+  }
+ 
+  // Alertas stat
+  const alertasR = await api("/api/alertas").catch(()=>({stock_bajo:[],por_caducar:[]}));
+  const totalAlertas = (alertasR.stock_bajo?.length||0) + (alertasR.por_caducar?.length||0);
+  document.getElementById("stat-alertas").textContent = totalAlertas;
+}
+ 
+// =============================================
+// USUARIOS
+// =============================================
+async function cargarUsuarios() {
+  const data = await api("/api/usuarios");
+  const tbody = document.getElementById("tabla-usuarios");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="5">No hay usuarios</td></tr>`
+    : data.map(u => `<tr>
+        <td><strong>${u.nombre}</strong></td>
+        <td>${u.correo}</td>
+        <td>${u.rol.replace(/_/g," ")}</td>
+        <td>${badge(u.activo ? "activo" : "inactivo")}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm ${u.activo ? 'btn-warning' : 'btn-success'}"
+            onclick="toggleUsuario(${u.id}, ${u.activo})">
+            ${u.activo ? "Desactivar" : "Activar"}
+          </button>
+          ${USER.rol === "admin_principal" ? `<button class="btn btn-sm btn-danger"
+            onclick="eliminarUsuario(${u.id}, '${u.nombre}')">Eliminar</button>` : ""}
+        </td>
+      </tr>`).join("");
+}
+ 
+async function crearUsuario() {
+  const body = {
+    nombre:   document.getElementById("u-nombre").value.trim(),
+    correo:   document.getElementById("u-correo").value.trim(),
+    password: document.getElementById("u-password").value,
+    rol:      document.getElementById("u-rol").value
+  };
+  if (!body.nombre || !body.correo || !body.password) { alert("Completa todos los campos"); return; }
+  const r = await api("/api/usuarios", { method:"POST", body: JSON.stringify(body) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cerrarModal("modal-usuario");
+  cargarUsuarios();
+}
+ 
+async function toggleUsuario(id, activo) {
+  await api(`/api/usuarios/${id}/activo`, { method:"PATCH", body: JSON.stringify({ activo: activo ? 0 : 1 }) });
+  cargarUsuarios();
+}
+ 
+async function eliminarUsuario(id, nombre) {
+  if (!confirmar(`¿Eliminar al usuario "${nombre}"?`)) return;
+  const r = await api(`/api/usuarios/${id}`, { method:"DELETE" });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cargarUsuarios();
+}
+ 
+// =============================================
+// PERSONAL
+// =============================================
+async function cargarPersonal() {
+  const data = await api("/api/personal");
+  const tbody = document.getElementById("tabla-personal");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="6">No hay personal registrado</td></tr>`
+    : data.map(p => `<tr>
+        <td><strong>${p.usuario?.nombre||"—"}</strong></td>
+        <td>${p.usuario?.rol?.replace(/_/g," ")||"—"}</td>
+        <td>${p.especialidad||"—"}</td>
+        <td>${p.turno||"—"}</td>
+        <td>${p.puede_recetar_controlados ? "✅" : "❌"}</td>
+        <td>${p.puede_recetar_psiquiatricos ? "✅" : "❌"}</td>
+      </tr>`).join("");
+}
+ 
+// =============================================
+// PACIENTES
+// =============================================
+async function cargarPacientes() {
+  const data = await api("/api/pacientes");
+  const tbody = document.getElementById("tabla-pacientes");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="6">No hay pacientes registrados</td></tr>`
+    : data.map(p => `<tr>
+        <td><strong>${p.nombre}</strong></td>
+        <td>${p.edad||"—"}</td>
+        <td>${p.habitacion||"Sin asignar"}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.diagnostico||"—"}</td>
+        <td>${p.medico?.nombre||"—"}</td>
+        <td>
+          <button class="btn btn-sm btn-ghost" onclick="verHistorial(${p.id}, '${p.nombre}')">Historial</button>
+          ${ROLES_ADMIN.includes(USER.rol) ? `<button class="btn btn-sm btn-danger" onclick="eliminarPaciente(${p.id}, '${p.nombre}')">Eliminar</button>` : ""}
+        </td>
+      </tr>`).join("");
+}
+ 
+async function crearPaciente() {
+  const body = {
+    nombre:      document.getElementById("p-nombre").value.trim(),
+    edad:        parseInt(document.getElementById("p-edad").value)||null,
+    telefono:    document.getElementById("p-telefono").value.trim(),
+    habitacion:  document.getElementById("p-habitacion").value.trim(),
+    diagnostico: document.getElementById("p-diagnostico").value.trim(),
+    direccion:   document.getElementById("p-direccion").value.trim(),
+    medico_id:   USER.id
+  };
+  if (!body.nombre) { alert("El nombre es obligatorio"); return; }
+  const r = await api("/api/pacientes", { method:"POST", body: JSON.stringify(body) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cerrarModal("modal-paciente");
+  cargarPacientes();
+}
+ 
+async function eliminarPaciente(id, nombre) {
+  if (!confirmar(`¿Eliminar al paciente "${nombre}"?`)) return;
+  await api(`/api/pacientes/${id}`, { method:"DELETE" });
+  cargarPacientes();
+}
+ 
+async function verHistorial(pacienteId, nombre) {
+  const data = await api(`/api/historial/${pacienteId}`);
+  const lista = Array.isArray(data) && data.length > 0
+    ? data.map(h => `<div style="border-bottom:1px solid #f1f5f9;padding:10px 0">
+        <div style="font-size:0.8rem;color:#9ca3af">${fmtFecha(h.fecha)} — Dr. ${h.medico?.nombre||"—"}</div>
+        <div style="margin-top:4px">${h.descripcion}</div>
+      </div>`).join("")
+    : "<p style='color:#9ca3af;text-align:center;padding:20px'>Sin entradas en el historial</p>";
+ 
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay open";
+  modal.innerHTML = `<div class="modal" style="max-width:600px">
+    <h3>📋 Historial — ${nombre}</h3>
+    <div style="max-height:350px;overflow-y:auto;margin:16px 0">${lista}</div>
+    ${ROLES_MEDICO.includes(USER.rol) ? `
+    <div class="form-group">
+      <label>Nueva entrada</label>
+      <textarea id="hist-nueva" rows="3" placeholder="Descripción del evento médico..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="agregarHistorial(${pacienteId}, this)">Agregar entrada</button>
+    ` : ""}
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
+}
+ 
+async function agregarHistorial(pacienteId, btn) {
+  const desc = document.getElementById("hist-nueva").value.trim();
+  if (!desc) { alert("Escribe una descripción"); return; }
+  btn.disabled = true;
+  const r = await api("/api/historial", { method:"POST", body: JSON.stringify({ paciente_id: pacienteId, descripcion: desc }) });
+  if (r.error) { alert("Error: " + r.error); btn.disabled = false; return; }
+  btn.closest(".modal-overlay").remove();
+  alert("✅ Entrada agregada al historial");
+}
+ 
+// =============================================
+// CITAS
+// =============================================
+async function cargarCitas() {
+  const data = await api("/api/citas");
+  const tbody = document.getElementById("tabla-citas");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="7">No hay citas registradas</td></tr>`
+    : data.map(c => `<tr>
+        <td><strong>${c.folio||"—"}</strong></td>
+        <td>${c.visitante_nombre||"—"}</td>
+        <td>${c.paciente_nombre||"—"}</td>
+        <td>${fmtFecha(c.fecha)}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.motivo||"—"}</td>
+        <td>${badge(c.estado)}</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap">
+          ${c.estado === "pendiente" ? `
+            <button class="btn btn-sm btn-success" onclick="cambiarEstadoCita(${c.id},'aprobada')">✅ Aprobar</button>
+            <button class="btn btn-sm btn-danger" onclick="cambiarEstadoCita(${c.id},'rechazada')">❌ Rechazar</button>
+          ` : ""}
+          ${c.estado === "aprobada" ? `
+            <button class="btn btn-sm btn-ghost" onclick="cambiarEstadoCita(${c.id},'completada')">Completar</button>
+          ` : ""}
+        </td>
+      </tr>`).join("");
+}
+ 
+async function cambiarEstadoCita(id, estado) {
+  await api(`/api/citas/${id}/estado`, { method:"PATCH", body: JSON.stringify({ estado }) });
+  cargarCitas();
+}
+ 
+// =============================================
+// MEDICAMENTOS
+// =============================================
+async function cargarMedicamentos() {
+  const data = await api("/api/medicamentos");
+  const tbody = document.getElementById("tabla-medicamentos");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="6">No hay medicamentos</td></tr>`
+    : data.map(m => {
+        const caducidadFmt = m.fecha_caducidad ? new Date(m.fecha_caducidad).toLocaleDateString("es-MX") : "—";
+        const pronto = m.fecha_caducidad && (new Date(m.fecha_caducidad) - Date.now()) < 30*24*60*60*1000;
+        const tipo = m.es_controlado && m.es_psiquiatrico
+          ? `<span class="badge controlado">Controlado</span> <span class="badge psiquiatrico">Psiquiátrico</span>`
+          : m.es_controlado ? `<span class="badge controlado">Controlado</span>`
+          : m.es_psiquiatrico ? `<span class="badge psiquiatrico">Psiquiátrico</span>`
+          : `<span class="badge aprobada">General</span>`;
+        return `<tr>
+          <td><strong>${m.nombre}</strong></td>
+          <td style="color:${m.cantidad <= (m.alerta_minimo||10) ? '#dc2626' : 'inherit'};font-weight:${m.cantidad <= (m.alerta_minimo||10) ? '700' : '400'}">
+            ${m.cantidad} ${m.cantidad <= (m.alerta_minimo||10) ? "⚠️" : ""}
+          </td>
+          <td>${m.unidad||"—"}</td>
+          <td style="color:${pronto ? '#dc2626' : 'inherit'}">${caducidadFmt}${pronto ? " ⚠️" : ""}</td>
+          <td>${tipo}</td>
+          <td>$${parseFloat(m.precio||0).toFixed(2)}</td>
+        </tr>`;
+      }).join("");
+}
+ 
+async function crearMedicamento() {
+  const tipo = document.getElementById("m-tipo").value;
+  const body = {
+    nombre:          document.getElementById("m-nombre").value.trim(),
+    descripcion:     document.getElementById("m-desc").value.trim(),
+    cantidad:        parseInt(document.getElementById("m-cantidad").value)||0,
+    unidad:          document.getElementById("m-unidad").value.trim(),
+    precio:          parseFloat(document.getElementById("m-precio").value)||0,
+    fecha_caducidad: document.getElementById("m-caducidad").value||null,
+    alerta_minimo:   parseInt(document.getElementById("m-alerta").value)||10,
+    es_controlado:   tipo[0]==="1" ? 1 : 0,
+    es_psiquiatrico: tipo[1]==="1" ? 1 : 0,
+  };
+  if (!body.nombre) { alert("El nombre es obligatorio"); return; }
+  const r = await api("/api/medicamentos", { method:"POST", body: JSON.stringify(body) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cerrarModal("modal-medicamento");
+  cargarMedicamentos();
+}
+ 
+// =============================================
+// INVENTARIO
+// =============================================
+async function cargarInventario() {
+  const data = await api("/api/inventario");
+  const tbody = document.getElementById("tabla-inventario");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="5">No hay equipo registrado</td></tr>`
+    : data.map(i => `<tr>
+        <td><strong>${i.nombre}</strong></td>
+        <td>${i.tipo}</td>
+        <td>${i.cantidad}</td>
+        <td>${badge(i.estado)}</td>
+        <td>${i.descripcion||"—"}</td>
+      </tr>`).join("");
+}
+ 
+async function crearInventario() {
+  const body = {
+    nombre:      document.getElementById("i-nombre").value.trim(),
+    tipo:        document.getElementById("i-tipo").value,
+    cantidad:    parseInt(document.getElementById("i-cantidad").value)||0,
+    estado:      document.getElementById("i-estado").value,
+    descripcion: document.getElementById("i-desc").value.trim(),
+  };
+  if (!body.nombre) { alert("El nombre es obligatorio"); return; }
+  const r = await api("/api/inventario", { method:"POST", body: JSON.stringify(body) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cerrarModal("modal-inventario");
+  cargarInventario();
+}
+ 
+// =============================================
+// RECETAS
+// =============================================
+async function cargarRecetas() {
+  const data = await api("/api/recetas");
+  const tbody = document.getElementById("tabla-recetas");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="7">Sin acceso</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="7">No hay recetas</td></tr>`
+    : data.map(r => `<tr>
+        <td>${r.paciente?.nombre||"—"}</td>
+        <td>${r.medico?.nombre||"—"}</td>
+        <td>${r.medicamento?.nombre||"—"}
+          ${r.medicamento?.es_controlado ? '<span class="badge controlado" style="margin-left:4px">C</span>' : ""}
+          ${r.medicamento?.es_psiquiatrico ? '<span class="badge psiquiatrico" style="margin-left:4px">P</span>' : ""}
+        </td>
+        <td>${r.dosis||"—"}</td>
+        <td>${fmtFecha(r.fecha)}</td>
+        <td>${badge(r.estado)}</td>
+        <td>
+          ${r.estado === "pendiente" && ROLES_FARMACIA.includes(USER.rol)
+            ? `<button class="btn btn-sm btn-success" onclick="entregarReceta(${r.id})">Entregar</button>`
+            : ""}
+        </td>
+      </tr>`).join("");
+}
+ 
+async function cargarSelectsReceta() {
+  const [pacs, meds] = await Promise.all([api("/api/pacientes"), api("/api/medicamentos")]);
+  const selPac = document.getElementById("r-paciente");
+  const selMed = document.getElementById("r-medicamento");
+  selPac.innerHTML = Array.isArray(pacs) ? pacs.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("") : "";
+  selMed.innerHTML = Array.isArray(meds) ? meds.map(m => `<option value="${m.id}">${m.nombre}${m.es_controlado?" [C]":""}${m.es_psiquiatrico?" [P]":""}</option>`).join("") : "";
+}
+ 
+function abrirModal(id) {
+  document.getElementById(id).classList.add("open");
+  if (id === "modal-receta") cargarSelectsReceta();
+}
+ 
+async function crearReceta() {
+  const body = {
+    paciente_id:    parseInt(document.getElementById("r-paciente").value),
+    medicamento_id: parseInt(document.getElementById("r-medicamento").value),
+    dosis:          document.getElementById("r-dosis").value.trim(),
+    indicaciones:   document.getElementById("r-indicaciones").value.trim(),
+  };
+  const r = await api("/api/recetas", { method:"POST", body: JSON.stringify(body) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cerrarModal("modal-receta");
+  cargarRecetas();
+}
+ 
+async function entregarReceta(id) {
+  if (!confirmar("¿Marcar esta receta como entregada y descontar del inventario?")) return;
+  const r = await api(`/api/recetas/${id}/entregar`, { method:"PATCH", body: JSON.stringify({}) });
+  if (r.error) { alert("Error: " + r.error); return; }
+  cargarRecetas();
+}
+ 
+// =============================================
+// ALERTAS
+// =============================================
+async function cargarAlertas() {
+  const data = await api("/api/alertas");
+ 
+  const divStock = document.getElementById("alertas-stock");
+  const divCad   = document.getElementById("alertas-caducidad");
+ 
+  divStock.innerHTML = data.stock_bajo?.length > 0
+    ? data.stock_bajo.map(m => `<div class="alerta-box danger">⚠️ <strong>${m.nombre}</strong> — Solo ${m.cantidad} unidades</div>`).join("")
+    : "<p style='color:#9ca3af;text-align:center;padding:20px'>Sin alertas de stock</p>";
+ 
+  divCad.innerHTML = data.por_caducar?.length > 0
+    ? data.por_caducar.map(m => `<div class="alerta-box warning">📅 <strong>${m.nombre}</strong> — Caduca ${new Date(m.fecha_caducidad).toLocaleDateString("es-MX")}</div>`).join("")
+    : "<p style='color:#9ca3af;text-align:center;padding:20px'>Sin medicamentos por caducar</p>";
+}
+ 
+// =============================================
+// LOGS
+// =============================================
+async function cargarRegistros() {
+  const data = await api("/api/registros");
+  const tbody = document.getElementById("tabla-registros");
+  if (!Array.isArray(data)) { tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Sin acceso — solo admin principal</td></tr>`; return; }
+  tbody.innerHTML = data.length === 0
+    ? `<tr class="empty-row"><td colspan="5">Sin registros</td></tr>`
+    : data.map(r => `<tr>
+        <td style="font-size:0.8rem;white-space:nowrap">${fmtFecha(r.fecha)}</td>
+        <td>${r.usuario?.nombre||"—"}</td>
+        <td>${r.accion||"—"}</td>
+        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.detalle||"—"}</td>
+        <td style="font-size:0.8rem;color:#9ca3af">${r.ip||"—"}</td>
+      </tr>`).join("");
+}
+ 
+// =============================================
+// ARRANCAR
+// =============================================
+init();
+</script>
 </body>
 </html>
